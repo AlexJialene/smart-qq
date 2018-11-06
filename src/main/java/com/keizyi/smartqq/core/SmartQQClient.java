@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.URL;
 import java.net.URLConnection;
 
 /**
@@ -32,7 +33,7 @@ public class SmartQQClient {
         //login
         insQRCodePath();
         insQRCode();
-        //checkingQRLogin();
+        checkingQRLogin();
 
         this.threadSwitch = true;
         //ins runnable
@@ -49,8 +50,33 @@ public class SmartQQClient {
                 e.printStackTrace();
             }
             //todo
-            //path : https://ssl.ptlogin2.qq.com/ptqrlogin?u1=https%3A%2F%2Fweb2.qq.com%2Fproxy.html&ptqrtoken=1956742765&ptredirect=0&h=1&t=1&g=1&from_ui=1&ptlang=2052&action=0-0-1541495368526&js_ver=10284&js_type=1&login_sig=&pt_uistyle=40&aid=501004106&daid=164&mibao_css=m_webqq&
-            //referer :　https://xui.ptlogin2.qq.com/cgi-bin/xlogin?daid=164&target=self&style=40&pt_disable_pwd=1&mibao_css=m_webqq&appid=501004106&enable_qlogin=0&no_verifyimg=1&s_url=https%3A%2F%2Fweb2.qq.com%2Fproxy.html&f_url=loginerroralert&strong_login=1&login_state=10&t=20131024001
+            String path = "https://ssl.ptlogin2.qq.com/ptqrlogin?u1=https%3A%2F%2Fweb2.qq.com%2Fproxy.html&ptqrtoken="+hash33(this.qrsig.replace("qrsig=" , ""))+"&ptredirect=0&h=1&t=1&g=1&from_ui=1&ptlang=2052&action=0-0-1541497137149&js_ver=10284&js_type=1&login_sig=&pt_uistyle=40&aid=501004106&daid=164&mibao_css=m_webqq&";
+            String referer="https://xui.ptlogin2.qq.com/cgi-bin/xlogin?daid=164&target=self&style=40&pt_disable_pwd=1&mibao_css=m_webqq&appid=501004106&enable_qlogin=0&no_verifyimg=1&s_url=https%3A%2F%2Fweb2.qq.com%2Fproxy.html&f_url=loginerroralert&strong_login=1&login_state=10&t=20131024001";
+            try {
+                String result = "";
+                BufferedReader in;
+                URL realUrl = new URL(path);
+                URLConnection connection = realUrl.openConnection();
+                connection.setRequestProperty("accept", "*/*");
+                connection.setRequestProperty("connection", "Keep-Alive");
+                connection.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
+                connection.setRequestProperty("referer",referer);
+                connection.setRequestProperty("cookie",qrsig);
+                //URLConnection connection = HttpRequestKit.connectGet(path , referer , HttpRequestKit.HttpType.GET);
+                in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String line;
+                try {
+                    while ((line = in.readLine()) != null) {
+                        result += line;
+                    }
+                    logger.info("checking login result : {}" ,result);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
 
         }
     }
