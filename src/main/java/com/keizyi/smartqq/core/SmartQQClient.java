@@ -1,6 +1,7 @@
 package com.keizyi.smartqq.core;
 
 import com.keizyi.smartqq.kit.HttpRequestKit;
+import com.keizyi.smartqq.kit.SmartQQKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ public class SmartQQClient {
                 e.printStackTrace();
             }
             //todo
-            String path = "https://ssl.ptlogin2.qq.com/ptqrlogin?u1=https%3A%2F%2Fweb2.qq.com%2Fproxy.html&ptqrtoken="+hash33(this.qrsig.replace("qrsig=" , ""))+"&ptredirect=0&h=1&t=1&g=1&from_ui=1&ptlang=2052&action=0-0-1541497137149&js_ver=10284&js_type=1&login_sig=&pt_uistyle=40&aid=501004106&daid=164&mibao_css=m_webqq&";
+            String path = "https://ssl.ptlogin2.qq.com/ptqrlogin?u1=https%3A%2F%2Fweb2.qq.com%2Fproxy.html&ptqrtoken="+ SmartQQKit.hash33(this.qrsig.replace("qrsig=" , ""))+"&ptredirect=0&h=1&t=1&g=1&from_ui=1&ptlang=2052&action=0-0-1541497137149&js_ver=10284&js_type=1&login_sig=&pt_uistyle=40&aid=501004106&daid=164&mibao_css=m_webqq&";
             String referer="https://xui.ptlogin2.qq.com/cgi-bin/xlogin?daid=164&target=self&style=40&pt_disable_pwd=1&mibao_css=m_webqq&appid=501004106&enable_qlogin=0&no_verifyimg=1&s_url=https%3A%2F%2Fweb2.qq.com%2Fproxy.html&f_url=loginerroralert&strong_login=1&login_state=10&t=20131024001";
             try {
                 String result = "";
@@ -92,7 +93,7 @@ public class SmartQQClient {
 
     public void insQRCode() {
         try {
-            URLConnection connection = HttpRequestKit.connectGet("https://ssl.ptlogin2.qq.com/ptqrshow?appid=501004106&e=2&l=M&s=3&d=72&v=4&t=0.9236259082903007&daid=164&pt_3rd_aid=0",null, HttpRequestKit.HttpType.GET);
+            URLConnection connection = HttpRequestKit.getConn("https://ssl.ptlogin2.qq.com/ptqrshow?appid=501004106&e=2&l=M&s=3&d=72&v=4&t=0.9236259082903007&daid=164&pt_3rd_aid=0");
             InputStream inputStream = connection.getInputStream();
             //get qrsig
             insQrsig(connection.getHeaderField("Set-Cookie"));
@@ -117,26 +118,6 @@ public class SmartQQClient {
             String[] cookies = headerField.split(";");
             this.qrsig = cookies[0];
         }
-    }
-
-    /**
-     * hash33: function(t) {
-     * for (var e = 0,i = 0,n = t.length; i < n; ++i){
-     * e += (e << 5) + t.charCodeAt(i);
-     * return 2147483647 & e
-     * }
-     * }
-     * The function that generates the ptqrtoken
-     *
-     * @param qrsig
-     * @return
-     */
-    public int hash33(String qrsig) {
-        int i = 0, e = 0;
-        for (; i < qrsig.length(); ++i) {
-            e += (e << 5) + qrsig.charAt(i);
-        }
-        return 2147483647 & e;
     }
 
     public String getQrsig() {

@@ -19,26 +19,26 @@ public class HttpRequestKit {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpRequestKit.class);
 
     public static String sendGet(String url) {
-        return sendGet(url, null);
+        return sendGet(url, null, null);
     }
 
-    public static String sendGet(String url, String param) {
-        BufferedReader in;
+    public static String sendGet(String url, Map<String, String> param) {
+        return sendGet(url, param, null);
+    }
+
+    public static String sendGet(String url, Map<String, String> param, Map<String, String> headers) {
+        URLConnection urlConnection = getConn(url, param, headers);
+        BufferedReader in = null;
         String result = "";
-        String urlString;
-        if (null == param) {
-            urlString = url;
-        } else {
-            urlString = url + "?" + param;
-        }
-        in = new BufferedReader(new InputStreamReader(doGet(urlString ,null)));
-        String line;
         try {
+            in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            String line;
             while ((line = in.readLine()) != null) {
                 result += line;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            return result;
+        } catch (Exception e) {
+
         } finally {
             if (null != in) {
                 try {
@@ -51,37 +51,58 @@ public class HttpRequestKit {
         return null;
     }
 
-    public static InputStream doGet(String urlNameString , String referer) {
+    public static URLConnection getConn(String url, Map<String, String> param, Map<String, String> headers) {
+        Piece piece = new Piece();
+        if (null != param) {
+            param.forEach((k, v) -> {
+                piece.piece(k, v);
+            });
+        }
+        return connection(url + piece.getUrlString(), HttpType.GET, null, headers);
+    }
+
+    public static URLConnection getConn(String url, Map<String, String> headers) {
+        return getConn(url, null, headers);
+    }
+
+    public static URLConnection getConn(String url) {
+        return getConn(url, null);
+    }
+
+    private static URLConnection connection(String url, HttpType type, Object postParam, Map<String, String> headers) {
         try {
-            URLConnection connection = connectGet(urlNameString, referer, HttpType.GET);
+            URL realUrl = new URL(url);
+            URLConnection connection = realUrl.openConnection();
+            connection.setRequestProperty("accept", "*/*");
+            connection.setRequestProperty("connection", "Keep-Alive");
+            connection.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
+            if (null != headers) {
+                headers.forEach((k, v) -> {
+                    connection.setRequestProperty(k, v);
+                });
+            }
+            if (type == HttpType.POST) {
+                connection.setDoOutput(true);
+                connection.setDoInput(true);
+                PrintWriter out = new PrintWriter(connection.getOutputStream());
+                out.print(postParam);
+                out.flush();
+            }else{
+                connection.connect();
+            }
             Map<String, List<String>> map = connection.getHeaderFields();
+
             //LOGGER DEBUG WRITER
             map.forEach((k, v) -> {
                 LOGGER.debug("key={} ; value={}", k, v.toString());
             });
-            return connection.getInputStream();
 
+            return connection;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
-    }
 
-    public static URLConnection connectGet(String url, String referer, HttpType type) throws IOException {
-        URL realUrl = new URL(url);
-        URLConnection connection = realUrl.openConnection();
-        connection.setRequestProperty("accept", "*/*");
-        connection.setRequestProperty("connection", "Keep-Alive");
-        connection.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
-        if (null != referer){
-            connection.setRequestProperty("referer" ,referer);
-        }
-        //connect
-        if (type == HttpType.POST) {
-            //
-        }
-        connection.connect();
-        return connection;
+        return null;
     }
 
     public static String sendPost(String url, String param) {
@@ -125,6 +146,19 @@ public class HttpRequestKit {
 
     public enum HttpType {
         GET,
-        POST;
+        POST
+    }
+
+    private static class Piece {
+        private String urlString = "?";
+
+        public void piece(String k, String v) {
+            urlString += k + "=" + v + "&";
+
+        }
+
+        public String getUrlString() {
+            return urlString.length() == 1 ? "" : urlString;
+        }
     }
 }
