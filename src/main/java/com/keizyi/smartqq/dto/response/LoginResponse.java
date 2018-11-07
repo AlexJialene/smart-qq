@@ -1,4 +1,6 @@
-package com.keizyi.smartqq.dto;
+package com.keizyi.smartqq.dto.response;
+
+import com.keizyi.smartqq.dto.XLoginDto;
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,12 +1,13 @@
 package keizyi.smartqq.test;
 
-import com.keizyi.smartqq.core.RequestHelper;
 import com.keizyi.smartqq.core.SmartQQClient;
-import com.keizyi.smartqq.dto.LoginResponse;
+import com.keizyi.smartqq.dto.XLoginDto;
+import com.keizyi.smartqq.dto.response.HttpResult;
 import com.keizyi.smartqq.kit.JsonMapperKit;
-import com.keizyi.smartqq.kit.RequestPathKit;
 import com.keizyi.smartqq.kit.SmartQQKit;
 import org.junit.Test;
+
+import java.io.IOException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,13 +44,12 @@ public class Test1 {
     }
 
     @Test
-    public void test5(){
+    public void test5() throws IOException {
         String s = "{\"result\":{\"cip\":23600812,\"f\":0,\"index\":1075,\"port\":47450,\"psessionid\":\"8368046764001d636f6e6e7365727665725f77656271714031302e3133332e34312e383400001ad00000066b026e040015808a206d0000000a406172314338344a69526d0000002859185d94e66218548d1ecb1a12513c86126b3afb97a3c2955b1070324790733ddb059ab166de6857\",\"status\":\"online\",\"uin\":467146659,\"user_state\":0,\"vfwebqq\":\"59185d94e66218548d1ecb1a12513c86126b3afb97a3c2955b1070324790733ddb059ab166de6857\"},\"retcode\":0}";
         JsonMapperKit jsonMapperKit = JsonMapperKit.nonNullMapper();
-        LoginResponse vfWebQQResponse = jsonMapperKit.fromJson(s , LoginResponse.class);
-        System.out.println(vfWebQQResponse.getRetcode());
-        System.out.println(vfWebQQResponse.getResult().getUin());
-
+        HttpResult res = jsonMapperKit.fromJson(s , HttpResult.class);
+        XLoginDto dto = (XLoginDto) res.asClass(XLoginDto.class);
+        System.out.println(dto.getCip());
 
     }
 
@@ -65,9 +65,6 @@ public class Test1 {
 
     @Test
     public void test7(){
-        new RequestHelper(RequestPathKit.QR_SHOW)
-                .addHeader("cookie" , "cookie")
-                .sendGet();
 
     }
 

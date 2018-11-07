@@ -7,6 +7,7 @@ import com.keizyi.smartqq.kit.SmartQQKit;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,7 +17,12 @@ import java.util.Map;
  */
 public class RequestHelper {
     private String reqPath;
-    private Map<String, String> headers = new HashMap<>();
+    private Map<String, String> headers = new ConcurrentHashMap<>();
+
+    public RequestHelper(String url, String... patten){
+        this.reqPath = SmartQQKit.urlAssembly(url, patten);
+        addHeader("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
+    }
 
     public RequestHelper(RequestPathKit kit, String... patten) {
         this.reqPath = SmartQQKit.urlAssembly(kit.getUrl(), patten);
@@ -32,11 +38,11 @@ public class RequestHelper {
         return this;
     }
 
-    public Map<String, String> getHeaders() {
+    private Map<String, String> getHeaders() {
         return headers;
     }
 
-    public String getReqPath() {
+    private String getReqPath() {
         return reqPath;
     }
 
