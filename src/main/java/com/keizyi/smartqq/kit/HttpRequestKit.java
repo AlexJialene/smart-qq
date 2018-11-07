@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -27,28 +28,7 @@ public class HttpRequestKit {
     }
 
     public static String sendGet(String url, Map<String, String> param, Map<String, String> headers) {
-        URLConnection urlConnection = getConn(url, param, headers);
-        BufferedReader in = null;
-        String result = "";
-        try {
-            in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-            String line;
-            while ((line = in.readLine()) != null) {
-                result += line;
-            }
-            return result;
-        } catch (Exception e) {
-
-        } finally {
-            if (null != in) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    ;
-                }
-            }
-        }
-        return null;
+        return result(getConn(url, param, headers));
     }
 
     public static URLConnection getConn(String url, Map<String, String> param, Map<String, String> headers) {
@@ -72,7 +52,7 @@ public class HttpRequestKit {
     private static URLConnection connection(String url, HttpType type, Object postParam, Map<String, String> headers) {
         try {
             URL realUrl = new URL(url);
-            URLConnection connection = realUrl.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) realUrl.openConnection();
             connection.setRequestProperty("accept", "*/*");
             connection.setRequestProperty("connection", "Keep-Alive");
             connection.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
@@ -82,12 +62,14 @@ public class HttpRequestKit {
                 });
             }
             if (type == HttpType.POST) {
+                connection.setRequestMethod("POST");
                 connection.setDoOutput(true);
                 connection.setDoInput(true);
                 PrintWriter out = new PrintWriter(connection.getOutputStream());
                 out.print(postParam);
                 out.flush();
-            }else{
+            } else {
+                connection.setInstanceFollowRedirects(false);
                 connection.connect();
             }
             Map<String, List<String>> map = connection.getHeaderFields();
@@ -102,6 +84,35 @@ public class HttpRequestKit {
             e.printStackTrace();
         }
 
+        return null;
+    }
+
+    public static String sendPost(String url, String postParam, Map<String, String> headers) {
+        return result(connection(url, HttpType.POST, postParam, headers));
+
+    }
+
+    private static String result(URLConnection connection) {
+        BufferedReader in = null;
+        String result = "";
+        try {
+            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                result += line;
+            }
+            return result;
+        } catch (Exception e) {
+
+        } finally {
+            if (null != in) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    ;
+                }
+            }
+        }
         return null;
     }
 

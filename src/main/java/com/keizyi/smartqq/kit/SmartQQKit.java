@@ -3,8 +3,11 @@ package com.keizyi.smartqq.kit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class SmartQQKit {
 
@@ -50,9 +53,34 @@ public class SmartQQKit {
                 .split(",");
 
         if ("0".equals(s[0]) && s[2].contains("https://") && s[4].contains("成功")) {
-            LOGGER.info("checking login success : {}", s[2]);
+            LOGGER.debug("checking login success : {}", s[2]);
             return s[2];
         }
         return null;
+    }
+
+    public static String urlAssembly(String url, String... param) {
+        StringBuilder sb = new StringBuilder(url);
+        Stream.of(param).forEach(k -> {
+            sb.replace(sb.indexOf("{"), sb.indexOf("}") + 1, k);
+
+        });
+        return sb.toString();
+    }
+
+    public static String vfCookie(Map<String, List<String>> urlConnectionHeadFields) {
+        StringBuilder sb = new StringBuilder();
+        urlConnectionHeadFields.forEach((k, v) -> {
+            if ("Set-Cookie".equals(k)) {
+                v.forEach(l -> {
+                    String[] array = l.split(";");
+                    if (null != array[0] && array[0].lastIndexOf("=") + 1 < array[0].length()) {
+                        sb.append(array[0]).append(";");
+                    }
+                });
+            }
+        });
+        LOGGER.debug("vfCookie : {}", sb.toString());
+        return sb.toString();
     }
 }

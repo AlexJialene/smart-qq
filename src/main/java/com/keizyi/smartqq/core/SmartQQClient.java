@@ -1,13 +1,20 @@
 package com.keizyi.smartqq.core;
 
+import com.keizyi.smartqq.dto.LoginResponse;
+import com.keizyi.smartqq.dto.VfWebQQResponse;
+import com.keizyi.smartqq.dto.XLoginFormData;
+import com.keizyi.smartqq.dto.XLoginResponse;
 import com.keizyi.smartqq.kit.HttpRequestKit;
+import com.keizyi.smartqq.kit.JsonMapperKit;
 import com.keizyi.smartqq.kit.SmartQQKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,8 +27,10 @@ public class SmartQQClient {
     //static area
     //
     private final static int APP_ID = 501004106;
+    private final static JsonMapperKit JSON_MAPPER_KIT = JsonMapperKit.nonNullMapper();
+
     private Logger logger = LoggerFactory.getLogger(SmartQQClient.class);
-    //
+    //ptqrshow response Set-Cookie & ptqrlogin? cookie
     private String qrsig;
 
     private String qrcodePath;
@@ -29,18 +38,52 @@ public class SmartQQClient {
     //the thread on || off flag;
     private boolean threadSwitch;
 
+    private String checkLoginResultLink;
+
+    private Map<String, List<String>> checkSigResponseHeader;
+
+    //the vfwebqq interface response
+    private String vfwebqq;
+
+    private XLoginResponse xLoginResponse;
+
 
     public SmartQQClient() {
         //login
         insQRCodePath();
         insQRCode();
         checkingQRLogin();
-
+        checkSig();
+        insVfWebQQ();
+        insXLogin();
         this.threadSwitch = true;
         //ins runnable
         //Instance ptqrshow
 
         //Instance thread to listen for ptqrlogin?
+    }
+
+    private void insXLogin() {
+        String path = "https://d1.web2.qq.com/channel/login2";
+        String referer = "https://d1.web2.qq.com/proxy.html?v=20151105001&callback=1&id=2";
+
+        Map<String, String> httpHeader = new HashMap<>();
+        httpHeader.put("referer", referer);
+        httpHeader.put("origin", "https://d1.web2.qq.com");
+        httpHeader.put("cookie", SmartQQKit.vfCookie(this.checkSigResponseHeader));
+        httpHeader.put("content-type" , "application/x-www-form-urlencoded");
+
+        String result = HttpRequestKit.sendPost(path , "r="+JSON_MAPPER_KIT.toJson(new XLoginFormData()) , httpHeader);
+        logger.debug("Xlogin result : {}" , result);
+    }
+
+    private void checkSig() {
+        if (null == checkLoginResultLink)
+            return;
+        //save check_sig cookie & other http headers
+        URLConnection urlConnection = HttpRequestKit.getConn(this.checkLoginResultLink);
+        this.checkSigResponseHeader = urlConnection.getHeaderFields();
+
     }
 
     private void checkingQRLogin() {
@@ -50,34 +93,22 @@ public class SmartQQClient {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            //todo
-            String path = "https://ssl.ptlogin2.qq.com/ptqrlogin?u1=https%3A%2F%2Fweb2.qq.com%2Fproxy.html&ptqrtoken="+ SmartQQKit.hash33(this.qrsig.replace("qrsig=" , ""))+"&ptredirect=0&h=1&t=1&g=1&from_ui=1&ptlang=2052&action=0-0-1541497137149&js_ver=10284&js_type=1&login_sig=&pt_uistyle=40&aid=501004106&daid=164&mibao_css=m_webqq&";
-            String referer="https://xui.ptlogin2.qq.com/cgi-bin/xlogin?daid=164&target=self&style=40&pt_disable_pwd=1&mibao_css=m_webqq&appid=501004106&enable_qlogin=0&no_verifyimg=1&s_url=https%3A%2F%2Fweb2.qq.com%2Fproxy.html&f_url=loginerroralert&strong_login=1&login_state=10&t=20131024001";
-            try {
-                String result = "";
-                BufferedReader in;
-                URL realUrl = new URL(path);
-                URLConnection connection = realUrl.openConnection();
-                connection.setRequestProperty("accept", "*/*");
-                connection.setRequestProperty("connection", "Keep-Alive");
-                connection.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
-                connection.setRequestProperty("referer",referer);
-                connection.setRequestProperty("cookie",qrsig);
-                //URLConnection connection = HttpRequestKit.connectGet(path , referer , HttpRequestKit.HttpType.GET);
-                in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String line;
-                try {
-                    while ((line = in.readLine()) != null) {
-                        result += line;
-                    }
-                    logger.info("checking login result : {}" ,result);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            //send ptqrlogin
+            String path = "https://ssl.ptlogin2.qq.com/ptqrlogin?u1=https%3A%2F%2Fweb2.qq.com%2Fproxy.html&ptqrtoken={}&ptredirect=0&h=1&t=1&g=1&from_ui=1&ptlang=2052&action=0-0-1541497137149&js_ver=10284&js_type=1&login_sig=&pt_uistyle=40&aid=501004106&daid=164&mibao_css=m_webqq&";
+            String referer = "https://xui.ptlogin2.qq.com/cgi-bin/xlogin?daid=164&target=self&style=40&pt_disable_pwd=1&mibao_css=m_webqq&appid=501004106&enable_qlogin=0&no_verifyimg=1&s_url=https%3A%2F%2Fweb2.qq.com%2Fproxy.html&f_url=loginerroralert&strong_login=1&login_state=10&t=20131024001";
+            String ptqrtoken = String.valueOf(SmartQQKit.hash33(this.qrsig.replace("qrsig=", "")));
 
+            Map<String, String> httpHeader = new HashMap<>();
+            httpHeader.put("referer", referer);
+            httpHeader.put("cookie", qrsig);
+
+            String result = HttpRequestKit.sendGet(SmartQQKit.urlAssembly(path, ptqrtoken), null, httpHeader);
+            String httpLink = SmartQQKit.ptuiCB(result);
+            if (null != httpLink) {
+                logger.info("登录成功");
+                this.checkLoginResultLink = httpLink;
+                break;
+            }
 
         }
     }
@@ -122,5 +153,28 @@ public class SmartQQClient {
 
     public String getQrsig() {
         return qrsig;
+    }
+
+    public String getCheckLoginResultLink() {
+        return checkLoginResultLink;
+    }
+
+    public void insVfWebQQ() {
+        //eg: ptwebqq was null in this path
+        String path = "https://s.web2.qq.com/api/getvfwebqq?ptwebqq=&clientid=53999199&psessionid=&t=1541564021367";
+        String referer = "https://s.web2.qq.com/proxy.html?v=20130916001&callback=1&id=1";
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put("referer", referer);
+        headers.put("cookie", SmartQQKit.vfCookie(this.checkSigResponseHeader));
+
+        String result = HttpRequestKit.sendGet(path, null, headers);
+        logger.debug("getVfWebQQ result : {}", result);
+
+        LoginResponse loginResponse = JSON_MAPPER_KIT.fromJson(result, LoginResponse.class);
+        if (null != loginResponse && 0 == loginResponse.getRetcode()) {
+            this.vfwebqq = loginResponse.getResult().getVfwebqq();
+        }
+        //return vfWebQQResponse;
     }
 }
