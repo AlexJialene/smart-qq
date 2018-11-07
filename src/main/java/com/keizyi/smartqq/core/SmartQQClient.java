@@ -1,8 +1,10 @@
 package com.keizyi.smartqq.core;
 
-import com.keizyi.smartqq.dto.response.LoginResponse;
-import com.keizyi.smartqq.dto.XLoginFormData;
-import com.keizyi.smartqq.dto.XLoginDto;
+import com.keizyi.smartqq.bean.SelfInfo;
+import com.keizyi.smartqq.bean.response.HttpResult;
+import com.keizyi.smartqq.bean.response.LoginResponse;
+import com.keizyi.smartqq.bean.XLoginFormData;
+import com.keizyi.smartqq.bean.XLogin;
 import com.keizyi.smartqq.kit.JsonMapperKit;
 import com.keizyi.smartqq.kit.RequestPathKit;
 import com.keizyi.smartqq.kit.SmartQQKit;
@@ -11,8 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URLConnection;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,12 +37,13 @@ public class SmartQQClient {
 
     private String checkLoginResultLink;
 
-    private Map<String, List<String>> checkSigResponseHeader;
+    private String checkSigResponseCookie;
 
     //the vfwebqq interface response
     private String vfwebqq;
-
-    private XLoginDto xLoginDto;
+    //bean
+    private XLogin xLogin;
+    private SelfInfo selfInfo;
 
 
     public SmartQQClient() {
@@ -53,9 +54,10 @@ public class SmartQQClient {
         checkSig();
         insVfWebQQ();
         insXLogin();
+        insSelfInfo();
+
         //login success
         //Gets myself info
-
 
 
         this.threadSwitch = true;
@@ -65,17 +67,32 @@ public class SmartQQClient {
         //Instance thread to listen for ptqrlogin?
     }
 
-    private void insXLogin() {
+    private void insSelfInfo() {
+        String resultStr = Request.$(RequestPathKit.SELF_INFO).addHeader("cookie" , this.checkSigResponseCookie).sendGet();
+        logger.debug("get self info : {}" , resultStr);
 
+        HttpResult result = JSON_MAPPER_KIT.fromJson(resultStr , HttpResult.class);
+        if (0 == result.getRetcode()){
+            SelfInfo selfInfo = (SelfInfo) result.asClass(SelfInfo.class);
+            if (null!= selfInfo){
+                this.selfInfo = selfInfo;
+                logger.info("登陆成功，欢迎用户： {}",selfInfo.getNick());
+            }
+        }
+    }
+
+    private void insXLogin() {
         String result = Request.$(RequestPathKit.X_LOGIN)
                 .addHeader("origin", "https://d1.web2.qq.com")
-                .addHeader("cookie", SmartQQKit.vfCookie(this.checkSigResponseHeader))
+                .addHeader("cookie", this.checkSigResponseCookie)
                 .addHeader("content-type", "application/x-www-form-urlencoded")
                 .sendPost("r=" + JSON_MAPPER_KIT.toJson(new XLoginFormData()));
-        logger.debug("login2 result : {}" , result);
+
+        logger.debug("login2 result : {}", result);
+
         LoginResponse loginResponse = JSON_MAPPER_KIT.fromJson(result, LoginResponse.class);
         if (null != loginResponse && 0 == loginResponse.getRetcode()) {
-            this.xLoginDto = loginResponse.getResult();
+            this.xLogin = loginResponse.getResult();
         }
     }
 
@@ -84,7 +101,8 @@ public class SmartQQClient {
             return;
         //save check_sig cookie & other http headers
         URLConnection urlConnection = Request.$(this.checkLoginResultLink).connGet();
-        this.checkSigResponseHeader = urlConnection.getHeaderFields();
+        //Gets cookies from headers
+        this.checkSigResponseCookie = SmartQQKit.vfCookie(urlConnection.getHeaderFields());
 
     }
 
@@ -100,15 +118,17 @@ public class SmartQQClient {
             String result = Request.$(RequestPathKit.PT_QR_LOGIN, ptqrtoken).addHeader("cookie", qrsig).sendGet();
             String httpLink = SmartQQKit.ptuiCB(result);
             if (null != httpLink) {
-                logger.info("登录成功");
+                logger.info("扫码登录成功");
                 this.checkLoginResultLink = httpLink;
                 break;
+            }else{
+                //TODO other
             }
 
         }
     }
 
-    public void insQRCodePath() {
+    private void insQRCodePath() {
         String filePath = System.getProperty("user.dir") + "/img";
         File file = new File(filePath);
         if (!file.exists()) {
@@ -117,7 +137,7 @@ public class SmartQQClient {
         this.qrcodePath = filePath + "/qrcode.png";
     }
 
-    public void insQRCode() {
+    private void insQRCode() {
         try {
             URLConnection connection = Request.$(RequestPathKit.QR_SHOW).connGet();
             InputStream inputStream = connection.getInputStream();
@@ -146,18 +166,10 @@ public class SmartQQClient {
         }
     }
 
-    public String getQrsig() {
-        return qrsig;
-    }
-
-    public String getCheckLoginResultLink() {
-        return checkLoginResultLink;
-    }
-
-    public void insVfWebQQ() {
+    private void insVfWebQQ() {
         //eg: ptwebqq was null in this path
-        String  result = Request.$(RequestPathKit.GET_VF_WEB_QQ)
-                .addHeader("cookie" , SmartQQKit.vfCookie(this.checkSigResponseHeader))
+        String result = Request.$(RequestPathKit.GET_VF_WEB_QQ)
+                .addHeader("cookie", this.checkSigResponseCookie)
                 .sendGet();
 
         logger.debug("getVfWebQQ result : {}", result);
@@ -168,7 +180,7 @@ public class SmartQQClient {
         }
     }
 
-    public static class Request{
+    public static class Request {
         public static RequestHelper $(RequestPathKit kit, String... patten) {
             return new RequestHelper(kit, patten);
         }
@@ -177,7 +189,6 @@ public class SmartQQClient {
             return new RequestHelper(url, patten);
         }
     }
-
 
 
 }

@@ -59,15 +59,6 @@ public class SmartQQKit {
         return null;
     }
 
-    public static String urlAssembly(String url, String... param) {
-        StringBuilder sb = new StringBuilder(url);
-        Stream.of(param).forEach(k -> {
-            sb.replace(sb.indexOf("{"), sb.indexOf("}") + 1, k);
-
-        });
-        return sb.toString();
-    }
-
     public static String vfCookie(Map<String, List<String>> urlConnectionHeadFields) {
         StringBuilder sb = new StringBuilder();
         urlConnectionHeadFields.forEach((k, v) -> {

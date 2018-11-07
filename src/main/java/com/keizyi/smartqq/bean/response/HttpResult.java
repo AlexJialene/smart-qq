@@ -1,4 +1,4 @@
-package com.keizyi.smartqq.dto.response;
+package com.keizyi.smartqq.bean.response;
 
 import com.keizyi.smartqq.kit.JsonMapperKit;
 
@@ -9,7 +9,7 @@ public class HttpResult<T> {
     //0:success
     private Integer retcode;
 
-    private HashMap<String,String> result;
+    private HashMap<String,Object> result;
 
     public Integer getRetcode() {
         return retcode;
@@ -19,11 +19,11 @@ public class HttpResult<T> {
         this.retcode = retcode;
     }
 
-    public HashMap<String, String> getResult() {
+    public HashMap<String, Object> getResult() {
         return result;
     }
 
-    public void setResult(HashMap<String, String> result) {
+    public void setResult(HashMap<String, Object> result) {
         this.result = result;
     }
 

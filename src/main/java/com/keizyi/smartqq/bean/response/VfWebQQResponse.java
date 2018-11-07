@@ -1,4 +1,4 @@
-package com.keizyi.smartqq.dto.response;
+package com.keizyi.smartqq.bean.response;
 
 import java.util.Map;
 

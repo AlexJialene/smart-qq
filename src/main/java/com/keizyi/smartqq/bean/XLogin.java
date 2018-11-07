@@ -1,4 +1,4 @@
-package com.keizyi.smartqq.dto;
+package com.keizyi.smartqq.bean;
 
 /**
  * Created by IntelliJ IDEA.
@@ -6,7 +6,7 @@ package com.keizyi.smartqq.dto;
  * Date: 2018/11/7
  * Time: 14:31
  */
-public class XLoginDto {
+public class XLogin {
 
     private Integer cip;
 

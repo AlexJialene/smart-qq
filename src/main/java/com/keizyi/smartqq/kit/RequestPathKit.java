@@ -23,6 +23,10 @@ public enum RequestPathKit {
     X_LOGIN(
             "https://d1.web2.qq.com/channel/login2",
             "https://d1.web2.qq.com/proxy.html?v=20151105001&callback=1&id=2"
+    ),
+    SELF_INFO(
+            "https://s.web2.qq.com/api/get_self_info2?t=1541603827945",
+            "https://s.web2.qq.com/proxy.html?v=20130916001&callback=1&id=1"
     );
 
 

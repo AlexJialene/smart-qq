@@ -8,6 +8,7 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,12 +21,12 @@ public class RequestHelper {
     private Map<String, String> headers = new ConcurrentHashMap<>();
 
     public RequestHelper(String url, String... patten){
-        this.reqPath = SmartQQKit.urlAssembly(url, patten);
+        this.reqPath = urlAssembly(url, patten);
         addHeader("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
     }
 
     public RequestHelper(RequestPathKit kit, String... patten) {
-        this.reqPath = SmartQQKit.urlAssembly(kit.getUrl(), patten);
+        this.reqPath = urlAssembly(kit.getUrl(), patten);
         addHeader("referer", kit.getReferer());
         addHeader("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
 
@@ -46,6 +47,15 @@ public class RequestHelper {
         return reqPath;
     }
 
+    private String urlAssembly(String url, String... param) {
+        StringBuilder sb = new StringBuilder(url);
+        Stream.of(param).forEach(k -> {
+            sb.replace(sb.indexOf("{"), sb.indexOf("}") + 1, k);
+
+        });
+        return sb.toString();
+    }
+
     public String sendGet() {
         return HttpRequestKit.sendGet(getReqPath(), null, getHeaders());
     }
@@ -57,6 +67,8 @@ public class RequestHelper {
     public URLConnection connGet() {
         return HttpRequestKit.connGet(getReqPath(), getHeaders());
     }
+
+
 
 
 }

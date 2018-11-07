@@ -1,6 +1,6 @@
-package com.keizyi.smartqq.dto.response;
+package com.keizyi.smartqq.bean.response;
 
-import com.keizyi.smartqq.dto.XLoginDto;
+import com.keizyi.smartqq.bean.XLogin;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,7 +12,7 @@ public class LoginResponse {
 
     private Integer retcode;
 
-    private XLoginDto result;
+    private XLogin result;
 
 
     public Integer getRetcode() {
@@ -23,11 +23,11 @@ public class LoginResponse {
         this.retcode = retcode;
     }
 
-    public XLoginDto getResult() {
+    public XLogin getResult() {
         return result;
     }
 
-    public void setResult(XLoginDto result) {
+    public void setResult(XLogin result) {
         this.result = result;
     }
 }

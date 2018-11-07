@@ -1,4 +1,4 @@
-package com.keizyi.smartqq.dto;
+package com.keizyi.smartqq.bean;
 
 /**
  * {"ptwebqq":"","clientid":53999199,"psessionid":"","status":"online"}
