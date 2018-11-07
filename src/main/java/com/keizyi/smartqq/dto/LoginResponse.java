@@ -10,7 +10,7 @@ public class LoginResponse {
 
     private Integer retcode;
 
-    private XLoginResponse result;
+    private XLoginDto result;
 
 
     public Integer getRetcode() {
@@ -21,11 +21,11 @@ public class LoginResponse {
         this.retcode = retcode;
     }
 
-    public XLoginResponse getResult() {
+    public XLoginDto getResult() {
         return result;
     }
 
-    public void setResult(XLoginResponse result) {
+    public void setResult(XLoginDto result) {
         this.result = result;
     }
 }

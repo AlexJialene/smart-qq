@@ -6,7 +6,7 @@ package com.keizyi.smartqq.dto;
  * Date: 2018/11/7
  * Time: 14:31
  */
-public class XLoginResponse {
+public class XLoginDto {
 
     private Integer cip;
 

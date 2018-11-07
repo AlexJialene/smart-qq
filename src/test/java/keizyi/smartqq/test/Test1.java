@@ -1,10 +1,10 @@
 package keizyi.smartqq.test;
 
+import com.keizyi.smartqq.core.RequestHelper;
 import com.keizyi.smartqq.core.SmartQQClient;
 import com.keizyi.smartqq.dto.LoginResponse;
-import com.keizyi.smartqq.dto.VfWebQQResponse;
-import com.keizyi.smartqq.dto.XLoginFormData;
 import com.keizyi.smartqq.kit.JsonMapperKit;
+import com.keizyi.smartqq.kit.RequestPathKit;
 import com.keizyi.smartqq.kit.SmartQQKit;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public class Test1 {
     @Test
     public void test4(){
         String path = "https://ssl.ptlogin2.qq.com/ptqrlogin?u1=https%3A%2F%2Fweb2.qq.com%2Fproxy.html&ptqrtoken={}&ptredirect={}&h=1&t=1&g=1&from_ui=1&ptlang=2052&action=0-0-1541497137149&js_ver=10284&js_type=1&login_sig=&pt_uistyle=40&aid=501004106&daid=164&mibao_css=m_webqq&";
-        System.out.println(SmartQQKit.urlAssembly(path , "token" , "token2"));
+        System.out.println(SmartQQKit.urlAssembly(path ));
         System.out.println(path);
     }
 
@@ -60,6 +60,14 @@ public class Test1 {
         System.out.println(array[0].length());
         System.out.println(array[0].lastIndexOf("="));
 
+
+    }
+
+    @Test
+    public void test7(){
+        new RequestHelper(RequestPathKit.QR_SHOW)
+                .addHeader("cookie" , "cookie")
+                .sendGet();
 
     }
 

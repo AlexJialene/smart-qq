@@ -1,9 +1,8 @@
 package com.keizyi.smartqq.core;
 
 import com.keizyi.smartqq.dto.LoginResponse;
-import com.keizyi.smartqq.dto.VfWebQQResponse;
 import com.keizyi.smartqq.dto.XLoginFormData;
-import com.keizyi.smartqq.dto.XLoginResponse;
+import com.keizyi.smartqq.dto.XLoginDto;
 import com.keizyi.smartqq.kit.HttpRequestKit;
 import com.keizyi.smartqq.kit.JsonMapperKit;
 import com.keizyi.smartqq.kit.SmartQQKit;
@@ -45,7 +44,7 @@ public class SmartQQClient {
     //the vfwebqq interface response
     private String vfwebqq;
 
-    private XLoginResponse xLoginResponse;
+    private XLoginDto xLoginDto;
 
 
     public SmartQQClient() {
@@ -56,6 +55,7 @@ public class SmartQQClient {
         checkSig();
         insVfWebQQ();
         insXLogin();
+        //
         this.threadSwitch = true;
         //ins runnable
         //Instance ptqrshow
@@ -74,14 +74,17 @@ public class SmartQQClient {
         httpHeader.put("content-type" , "application/x-www-form-urlencoded");
 
         String result = HttpRequestKit.sendPost(path , "r="+JSON_MAPPER_KIT.toJson(new XLoginFormData()) , httpHeader);
-        logger.debug("Xlogin result : {}" , result);
+        LoginResponse loginResponse = JSON_MAPPER_KIT.fromJson(result , LoginResponse.class);
+        if (null!=loginResponse && 0 == loginResponse.getRetcode()){
+            this.xLoginDto = loginResponse.getResult();
+        }
     }
 
     private void checkSig() {
         if (null == checkLoginResultLink)
             return;
         //save check_sig cookie & other http headers
-        URLConnection urlConnection = HttpRequestKit.getConn(this.checkLoginResultLink);
+        URLConnection urlConnection = HttpRequestKit.connGet(this.checkLoginResultLink);
         this.checkSigResponseHeader = urlConnection.getHeaderFields();
 
     }
@@ -124,7 +127,7 @@ public class SmartQQClient {
 
     public void insQRCode() {
         try {
-            URLConnection connection = HttpRequestKit.getConn("https://ssl.ptlogin2.qq.com/ptqrshow?appid=501004106&e=2&l=M&s=3&d=72&v=4&t=0.9236259082903007&daid=164&pt_3rd_aid=0");
+            URLConnection connection = HttpRequestKit.connGet("https://ssl.ptlogin2.qq.com/ptqrshow?appid=501004106&e=2&l=M&s=3&d=72&v=4&t=0.9236259082903007&daid=164&pt_3rd_aid=0");
             InputStream inputStream = connection.getInputStream();
             //get qrsig
             insQrsig(connection.getHeaderField("Set-Cookie"));
