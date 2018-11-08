@@ -1,7 +1,7 @@
 package com.keizyi.smartqq.core;
 
 import com.keizyi.smartqq.bean.SelfInfo;
-import com.keizyi.smartqq.bean.response.HttpResult;
+import com.keizyi.smartqq.bean.response.HttpMapResult;
 import com.keizyi.smartqq.bean.response.LoginResponse;
 import com.keizyi.smartqq.bean.XLoginFormData;
 import com.keizyi.smartqq.bean.XLogin;
@@ -31,7 +31,7 @@ public class SmartQQClient {
     private String qrsig;
     private String qrcodePath;
     private String checkLoginResultLink;
-    private volatile String checkSigResponseCookie;
+    private String checkSigResponseCookie;
 
     //the vfwebqq interface response
     private String vfwebqq;
@@ -79,10 +79,13 @@ public class SmartQQClient {
     }
 
     private void insSelfInfo() {
-        String resultStr = Request.$(RequestPathKit.SELF_INFO).addHeader("cookie", this.checkSigResponseCookie).sendGet();
-        logger.debug("get self info : {}", resultStr);
+        String resultStr = Request.$(RequestPathKit.SELF_INFO)
+                .addHeader("cookie", this.checkSigResponseCookie)
+                .sendGet()
+                .get();
 
-        HttpResult result = jsonMapper.fromJson(resultStr, HttpResult.class);
+        logger.debug("get self info : {}", resultStr);
+        HttpMapResult result = jsonMapper.fromJson(resultStr, HttpMapResult.class);
         if (0 == result.getRetcode()) {
             SelfInfo selfInfo = (SelfInfo) result.asClass(SelfInfo.class);
             if (null != selfInfo) {
@@ -93,15 +96,15 @@ public class SmartQQClient {
     }
 
     private void insXLogin() {
-        String result = Request.$(RequestPathKit.X_LOGIN)
+        LoginResponse loginResponse = (LoginResponse) Request.$(RequestPathKit.X_LOGIN)
                 .addHeader("origin", "https://d1.web2.qq.com")
                 .addHeader("cookie", this.checkSigResponseCookie)
                 .addHeader("content-type", "application/x-www-form-urlencoded")
-                .sendPost(jsonFormData(new XLoginFormData()));
+                .sendPost(jsonFormData(new XLoginFormData()))
+                .toResult(LoginResponse.class);
 
-        logger.debug("login2 result : {}", result);
-
-        LoginResponse loginResponse = jsonMapper.fromJson(result, LoginResponse.class);
+        //logger.debug("login2 result : {}", result);
+        //LoginResponse loginResponse = jsonMapper.fromJson(result, LoginResponse.class);
         if (null != loginResponse && 0 == loginResponse.getRetcode()) {
             this.xLogin = loginResponse.getResult();
         }
@@ -126,7 +129,10 @@ public class SmartQQClient {
             }
             //send ptqrlogin
             String ptqrtoken = String.valueOf(SmartQQKit.hash33(this.qrsig.replace("qrsig=", "")));
-            String result = Request.$(RequestPathKit.PT_QR_LOGIN, ptqrtoken).addHeader("cookie", qrsig).sendGet();
+            String result = Request.$(RequestPathKit.PT_QR_LOGIN, ptqrtoken).
+                    addHeader("cookie", qrsig)
+                    .sendGet()
+                    .get();
             String httpLink = SmartQQKit.ptuiCB(result);
             if (null != httpLink) {
                 logger.info("扫码登录成功");
@@ -181,7 +187,8 @@ public class SmartQQClient {
         //eg: ptwebqq was null in this path
         String result = Request.$(RequestPathKit.GET_VF_WEB_QQ)
                 .addHeader("cookie", this.checkSigResponseCookie)
-                .sendGet();
+                .sendGet()
+                .get();
 
         logger.debug("getVfWebQQ result : {}", result);
 

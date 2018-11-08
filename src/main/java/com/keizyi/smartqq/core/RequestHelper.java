@@ -1,7 +1,10 @@
 package com.keizyi.smartqq.core;
 
 import com.keizyi.smartqq.kit.HttpRequestKit;
+import com.keizyi.smartqq.kit.JsonMapperKit;
 import com.keizyi.smartqq.kit.RequestPathKit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URLConnection;
 import java.util.Map;
@@ -16,7 +19,9 @@ import java.util.stream.Stream;
  */
 public class RequestHelper {
     private String reqPath;
+    private String result;
     private Map<String, String> headers = new ConcurrentHashMap<>();
+    private Logger logger = LoggerFactory.getLogger(RequestHelper.class);
 
     public RequestHelper(String url, String... patten) {
         this.reqPath = urlAssembly(url, patten);
@@ -54,16 +59,31 @@ public class RequestHelper {
         return sb.toString();
     }
 
-    public String sendGet() {
-        return HttpRequestKit.sendGet(getReqPath(), null, getHeaders());
+    public RequestHelper sendGet() {
+        this.result = HttpRequestKit.sendGet(getReqPath(), null, getHeaders());
+        return this;
     }
 
-    public String sendPost(String postParam) {
-        return HttpRequestKit.sendPost(getReqPath(), postParam, getHeaders());
+    public RequestHelper sendPost(String postParam) {
+        this.result = HttpRequestKit.sendPost(getReqPath(), postParam, getHeaders());
+        return this;
     }
 
     public URLConnection connGet() {
         return HttpRequestKit.connGet(getReqPath(), getHeaders());
+    }
+
+    public Object toResult(Class<?> clazz) {
+        int i = this.reqPath.indexOf("?");
+        String reqName = this.reqPath.substring(this.reqPath.lastIndexOf("/"), i == -1 ? this.reqPath.length() : i);
+
+        logger.debug("the request [ {} ] result: {}", reqName, this.result);
+
+        return JsonMapperKit.nonNullMapper().fromJson(this.result, clazz);
+    }
+
+    public String get() {
+        return this.result;
     }
 
 }

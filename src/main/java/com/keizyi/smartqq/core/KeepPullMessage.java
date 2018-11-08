@@ -43,7 +43,7 @@ public class KeepPullMessage extends Thread{
         Pull2FormData data = new Pull2FormData(this.client.xLogin().getPsessionid());
 
         while (startFlag){
-            String result = requestHelper.sendPost(this.client.jsonFormData(data));
+            String result = requestHelper.sendPost(this.client.jsonFormData(data)).get();
             logger.debug("pull message result: {}" ,result);
             //callback
 

@@ -4,12 +4,14 @@ import com.keizyi.smartqq.kit.JsonMapperKit;
 
 import java.util.HashMap;
 
-public class HttpResult<T> {
+public class HttpMapResult<T> {
 
     //0:success
     private Integer retcode;
 
     private HashMap<String,Object> result;
+
+    private String retmsg;
 
     public Integer getRetcode() {
         return retcode;
@@ -30,5 +32,13 @@ public class HttpResult<T> {
     public T asClass(Class<T> clazz){
         JsonMapperKit jsonMapperKit = JsonMapperKit.nonNullMapper();
         return jsonMapperKit.fromJson(jsonMapperKit.toJson(result) , clazz);
+    }
+
+    public String getRetmsg() {
+        return retmsg;
+    }
+
+    public void setRetmsg(String retmsg) {
+        this.retmsg = retmsg;
     }
 }
