@@ -27,6 +27,10 @@ public enum RequestPathKit {
     SELF_INFO(
             "https://s.web2.qq.com/api/get_self_info2?t=1541603827945",
             "https://s.web2.qq.com/proxy.html?v=20130916001&callback=1&id=1"
+    ),
+    PULL_MSG(
+            "https://d1.web2.qq.com/channel/poll2",
+            "https://d1.web2.qq.com/proxy.html?v=20151105001&callback=1&id=2"
     );
 
 

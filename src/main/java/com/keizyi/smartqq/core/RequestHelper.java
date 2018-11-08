@@ -2,10 +2,8 @@ package com.keizyi.smartqq.core;
 
 import com.keizyi.smartqq.kit.HttpRequestKit;
 import com.keizyi.smartqq.kit.RequestPathKit;
-import com.keizyi.smartqq.kit.SmartQQKit;
 
 import java.net.URLConnection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
@@ -20,7 +18,7 @@ public class RequestHelper {
     private String reqPath;
     private Map<String, String> headers = new ConcurrentHashMap<>();
 
-    public RequestHelper(String url, String... patten){
+    public RequestHelper(String url, String... patten) {
         this.reqPath = urlAssembly(url, patten);
         addHeader("user-agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36");
     }
@@ -67,8 +65,5 @@ public class RequestHelper {
     public URLConnection connGet() {
         return HttpRequestKit.connGet(getReqPath(), getHeaders());
     }
-
-
-
 
 }

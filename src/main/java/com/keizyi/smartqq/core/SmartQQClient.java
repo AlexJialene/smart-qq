@@ -22,32 +22,49 @@ import java.net.URLConnection;
  */
 public class SmartQQClient {
 
-    //static area
-    private final static int APP_ID = 501004106;
-    private final static JsonMapperKit JSON_MAPPER_KIT = JsonMapperKit.nonNullMapper();
-
+    private final Callback callback;
     private Logger logger = LoggerFactory.getLogger(SmartQQClient.class);
+
+    private JsonMapperKit jsonMapper = JsonMapperKit.nonNullMapper();
+
     //ptqrshow response Set-Cookie & ptqrlogin? cookie
     private String qrsig;
-
     private String qrcodePath;
-
-    //the thread on || off flag;
-    private boolean threadSwitch;
-
     private String checkLoginResultLink;
-
-    private String checkSigResponseCookie;
+    private volatile String checkSigResponseCookie;
 
     //the vfwebqq interface response
     private String vfwebqq;
-    //bean
+
+    //login info & user info
     private XLogin xLogin;
+
     private SelfInfo selfInfo;
 
+    private KeepPullMessage keepPullMessage;
 
-    public SmartQQClient() {
-        //login
+
+    public SmartQQClient(Callback callback) {
+        this.callback = callback;
+        if (login()) {
+            logger.info("接收消息组件初始化");
+            this.keepPullMessage = new KeepPullMessage(this);
+            //todo
+        }
+    }
+
+    public SmartQQClient startReceive() {
+        if (null != this.keepPullMessage)
+            this.keepPullMessage.start();
+        return this;
+    }
+
+    public SmartQQClient closeReceive() {
+        this.keepPullMessage.close();
+        return this;
+    }
+
+    private boolean login() {
         insQRCodePath();
         insQRCode();
         checkingQRLogin();
@@ -55,28 +72,22 @@ public class SmartQQClient {
         insVfWebQQ();
         insXLogin();
         insSelfInfo();
-
-        //login success
-        //Gets myself info
-
-
-        this.threadSwitch = true;
-        //ins runnable
-        //Instance ptqrshow
-
-        //Instance thread to listen for ptqrlogin?
+        if (null != checkSigResponseCookie) {
+            return true;
+        }
+        return false;
     }
 
     private void insSelfInfo() {
-        String resultStr = Request.$(RequestPathKit.SELF_INFO).addHeader("cookie" , this.checkSigResponseCookie).sendGet();
-        logger.debug("get self info : {}" , resultStr);
+        String resultStr = Request.$(RequestPathKit.SELF_INFO).addHeader("cookie", this.checkSigResponseCookie).sendGet();
+        logger.debug("get self info : {}", resultStr);
 
-        HttpResult result = JSON_MAPPER_KIT.fromJson(resultStr , HttpResult.class);
-        if (0 == result.getRetcode()){
+        HttpResult result = jsonMapper.fromJson(resultStr, HttpResult.class);
+        if (0 == result.getRetcode()) {
             SelfInfo selfInfo = (SelfInfo) result.asClass(SelfInfo.class);
-            if (null!= selfInfo){
+            if (null != selfInfo) {
                 this.selfInfo = selfInfo;
-                logger.info("登陆成功，欢迎用户： {}",selfInfo.getNick());
+                logger.info("登陆成功，欢迎用户： {}", selfInfo.getNick());
             }
         }
     }
@@ -86,11 +97,11 @@ public class SmartQQClient {
                 .addHeader("origin", "https://d1.web2.qq.com")
                 .addHeader("cookie", this.checkSigResponseCookie)
                 .addHeader("content-type", "application/x-www-form-urlencoded")
-                .sendPost("r=" + JSON_MAPPER_KIT.toJson(new XLoginFormData()));
+                .sendPost(jsonFormData(new XLoginFormData()));
 
         logger.debug("login2 result : {}", result);
 
-        LoginResponse loginResponse = JSON_MAPPER_KIT.fromJson(result, LoginResponse.class);
+        LoginResponse loginResponse = jsonMapper.fromJson(result, LoginResponse.class);
         if (null != loginResponse && 0 == loginResponse.getRetcode()) {
             this.xLogin = loginResponse.getResult();
         }
@@ -121,7 +132,7 @@ public class SmartQQClient {
                 logger.info("扫码登录成功");
                 this.checkLoginResultLink = httpLink;
                 break;
-            }else{
+            } else {
                 //TODO other
             }
 
@@ -174,10 +185,22 @@ public class SmartQQClient {
 
         logger.debug("getVfWebQQ result : {}", result);
 
-        LoginResponse loginResponse = JSON_MAPPER_KIT.fromJson(result, LoginResponse.class);
+        LoginResponse loginResponse = jsonMapper.fromJson(result, LoginResponse.class);
         if (null != loginResponse && 0 == loginResponse.getRetcode()) {
             this.vfwebqq = loginResponse.getResult().getVfwebqq();
         }
+    }
+
+    protected String jsonFormData(Object obj) {
+        return "r=" + this.jsonMapper.toJson(obj);
+    }
+
+    protected XLogin xLogin() {
+        return this.xLogin;
+    }
+
+    protected String getCheckSigResponseCookie() {
+        return checkSigResponseCookie;
     }
 
     public static class Request {
