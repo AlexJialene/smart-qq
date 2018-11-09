@@ -166,7 +166,7 @@ public class SmartQQClient {
             }
             outputStream.close();
             inputStream.close();
-            logger.info("Your login QR code has been generated ; path : {}", this.qrcodePath);
+            logger.info("登录二维码已生成 [ {} ]，扫码登录...", this.qrcodePath);
         } catch (Exception e) {
             e.printStackTrace();
         }

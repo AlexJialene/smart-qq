@@ -15,12 +15,7 @@ public class Application {
 
     public static void main(String[] args) throws InterruptedException {
 
-        SmartQQClient smartQQClient = new SmartQQClient(new Callback() {
-            @Override
-            public void onMessage(Message message) {
-                System.out.println(message.getContent()[1]);
-            }
-        }).startReceive();
+        SmartQQClient smartQQClient = new SmartQQClient(null);
 
 
     }
