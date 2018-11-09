@@ -4,7 +4,7 @@
 
 ### preface
 
-Because the official website protocol changes frequently, so i write one and maintain it myself.
+Because the official website protocol changes frequently, So write a project and keep updating.
 
 
 
