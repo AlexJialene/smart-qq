@@ -8,17 +8,21 @@ package com.keizyi.smartqq.bean;
  */
 public class Message {
 
+    /*
+    content[0] = Array,length=2
+    content[1] = String:msg
+     */
     private Object[] content;
 
-    private Integer from_uin;
+    private long from_uin;
 
     private Integer msg_id;
 
     private Integer msg_type;
 
-    private Integer time;
+    private long time;
 
-    private Integer to_uin;
+    private long to_uin;
 
     public String getMessage() {
         if (null != content[1])
@@ -34,11 +38,11 @@ public class Message {
         this.content = content;
     }
 
-    public Integer getFrom_uin() {
+    public long getFrom_uin() {
         return from_uin;
     }
 
-    public void setFrom_uin(Integer from_uin) {
+    public void setFrom_uin(long from_uin) {
         this.from_uin = from_uin;
     }
 
@@ -58,19 +62,20 @@ public class Message {
         this.msg_type = msg_type;
     }
 
-    public Integer getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(Integer time) {
+    public void setTime(long time) {
         this.time = time;
     }
 
-    public Integer getTo_uin() {
+    public long getTo_uin() {
         return to_uin;
     }
 
-    public void setTo_uin(Integer to_uin) {
+    public void setTo_uin(long to_uin) {
         this.to_uin = to_uin;
     }
+
 }

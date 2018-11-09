@@ -12,7 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 /**
- * Created by IntelliJ IDEA.
+ * Thread is not secure
+ * Must instantiate each time.
+ *
  * User: Alex_
  * Date: 2018/11/7
  * Time: 17:12

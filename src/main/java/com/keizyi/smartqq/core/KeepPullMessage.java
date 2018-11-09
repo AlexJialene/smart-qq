@@ -1,6 +1,9 @@
 package com.keizyi.smartqq.core;
 
+import com.keizyi.smartqq.bean.Message;
+import com.keizyi.smartqq.bean.MessageValue;
 import com.keizyi.smartqq.bean.Pull2FormData;
+import com.keizyi.smartqq.bean.response.HttpListResult;
 import com.keizyi.smartqq.kit.RequestPathKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,17 +43,36 @@ public class KeepPullMessage extends Thread{
         logger.debug("keep pull message psessionid: {}",this.client.xLogin().getPsessionid());
         logger.info("开启接收QQ消息");
 
-        RequestHelper requestHelper = SmartQQClient.Request.$(RequestPathKit.PULL_MSG)
-                .addHeader("cookie",this.client.getCheckSigResponseCookie())
-                .addHeader("origin","https://d1.web2.qq.com")
-                .addHeader("content-type","application/x-www-form-urlencoded");
         Pull2FormData data = new Pull2FormData(this.client.xLogin().getPsessionid());
-
         while (startFlag){
-            String result = requestHelper.sendPost(this.client.jsonFormData(data)).get();
+            HttpListResult result = (HttpListResult) SmartQQClient.Request.$(RequestPathKit.PULL_MSG)
+                    .addHeader("cookie",this.client.getCheckSigResponseCookie())
+                    .addHeader("origin","https://d1.web2.qq.com")
+                    .addHeader("content-type","application/x-www-form-urlencoded")
+                    .sendPost(this.client.jsonFormData(data))
+                    .toResult(HttpListResult.class);
 
-            logger.info("pull message result: {}" ,result);
-            //callback
+            logger.debug("pull message json string result: {}" ,result);
+
+            if (0 == result.getRetcode() && null == result.getErrmsg()){
+                MessageValue messageValue = (MessageValue) result.asClass(MessageValue.class);
+                switch (messageValue.getPoll_type()){
+                    case "message":
+                        this.client.callback().onMessage((Message) messageValue.asClass(Message.class));
+                        break;
+                    case "group_message":
+                        break;
+
+                    case "discu_message":
+                        break;
+
+                    default:
+                        break;
+                }
+
+            }else {
+                logger.warn("pull message json string error!");
+            }
 
 
         }

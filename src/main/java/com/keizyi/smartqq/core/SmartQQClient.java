@@ -22,9 +22,7 @@ import java.net.URLConnection;
  */
 public class SmartQQClient {
 
-    private final Callback callback;
     private Logger logger = LoggerFactory.getLogger(SmartQQClient.class);
-
     //ptqrshow response Set-Cookie & ptqrlogin? cookie
     private String qrsig;
     private String qrcodePath;
@@ -39,8 +37,9 @@ public class SmartQQClient {
 
     private SelfInfo selfInfo;
 
-    private KeepPullMessage keepPullMessage;
+    private Callback callback;
 
+    private KeepPullMessage keepPullMessage;
 
     public SmartQQClient(Callback callback) {
         this.callback = callback;
@@ -52,7 +51,7 @@ public class SmartQQClient {
     }
 
     public SmartQQClient startReceive() {
-        if (null != this.keepPullMessage)
+        if (null != this.keepPullMessage && null != this.callback)
             this.keepPullMessage.start();
         return this;
     }
@@ -206,6 +205,10 @@ public class SmartQQClient {
 
     protected String getCheckSigResponseCookie() {
         return checkSigResponseCookie;
+    }
+
+    protected Callback callback() {
+        return this.callback;
     }
 
     public static class Request {

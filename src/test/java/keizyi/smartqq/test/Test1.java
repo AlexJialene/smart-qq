@@ -51,8 +51,7 @@ public class Test1 {
 
     @Test
     public void test5() throws IOException {
-        Pull2FormData data = new Pull2FormData("123123");
-        System.out.println(JsonKit.toFeatureJson(data));
+        //long i = 2629709360;
     }
 
     @Test
@@ -74,13 +73,29 @@ public class Test1 {
         System.out.println(result.getRetcode());
         System.out.println(result.getResult());
 
-        MessageValue value = (MessageValue) result.asClass(MessageValue.class);
-        System.out.println(value.getPoll_type());
-        System.out.println(value.getValue());
+
+        String json = JsonKit.toFeatureJson(result.getResult().get(0));
+        System.out.println(json);
         //System.out.println(value.getValue().get("msg_id"));
 
         //System.out.println(value.getPoll_type());
         //System.out.println(value.getValue());
+    }
+
+    @Test
+    public void test8(){
+        String s = "{\"result\":\"error\",\"retcode\":0,\"retmsg\":\"ok\"}\n";
+        HttpListResult result = JsonKit.parse(s , HttpListResult.class);
+        System.out.println(result.getRetcode());
+        System.out.println(result.getResult());
+        try {
+
+            String json = JsonKit.toFeatureJson(result.getResult().get(0));
+            System.out.println(json);
+        }catch (Exception e){
+            System.out.println(111);
+        }
+
     }
 
 

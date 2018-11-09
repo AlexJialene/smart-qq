@@ -19,9 +19,14 @@ public class HttpListResult<T> implements AsClass<T> {
 
     private String retmsg;
 
+    private String errmsg;
+
     public T asClass(Class<T> clazz) {
-        String json = JsonKit.toFeatureJson(this.result.get(0));
-        return JsonKit.parse(json, clazz);
+        if (null!=result){
+            String json = JsonKit.toFeatureJson(this.result.get(0));
+            return JsonKit.parse(json, clazz);
+        }
+        return null;
     }
 
     public Integer getRetcode() {
@@ -46,5 +51,13 @@ public class HttpListResult<T> implements AsClass<T> {
 
     public void setRetmsg(String retmsg) {
         this.retmsg = retmsg;
+    }
+
+    public String getErrmsg() {
+        return errmsg;
+    }
+
+    public void setErrmsg(String errmsg) {
+        this.errmsg = errmsg;
     }
 }
