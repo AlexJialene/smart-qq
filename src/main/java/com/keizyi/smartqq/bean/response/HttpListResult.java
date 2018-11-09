@@ -1,5 +1,7 @@
 package com.keizyi.smartqq.bean.response;
-import com.keizyi.smartqq.kit.JsonMapperKit;
+
+import com.keizyi.smartqq.bean.AsClass;
+import com.keizyi.smartqq.kit.JsonKit;
 
 import java.util.List;
 
@@ -9,7 +11,7 @@ import java.util.List;
  * Date: 2018/11/8
  * Time: 16:34
  */
-public class HttpListResult<T> {
+public class HttpListResult<T> implements AsClass<T> {
     //0:success
     private Integer retcode;
 
@@ -17,9 +19,9 @@ public class HttpListResult<T> {
 
     private String retmsg;
 
-    public T asClass(Class<T> clazz){
-        JsonMapperKit jsonMapperKit = JsonMapperKit.nonNullMapper();
-        return jsonMapperKit.fromJson(jsonMapperKit.toJson(result.get(0)) , clazz);
+    public T asClass(Class<T> clazz) {
+        String json = JsonKit.toFeatureJson(this.result.get(0));
+        return JsonKit.parse(json, clazz);
     }
 
     public Integer getRetcode() {

@@ -1,6 +1,6 @@
 package com.keizyi.smartqq.bean.response;
 
-import com.keizyi.smartqq.kit.JsonMapperKit;
+import com.keizyi.smartqq.kit.JsonKit;
 
 import java.util.HashMap;
 
@@ -30,8 +30,7 @@ public class HttpMapResult<T> {
     }
 
     public T asClass(Class<T> clazz){
-        JsonMapperKit jsonMapperKit = JsonMapperKit.nonNullMapper();
-        return jsonMapperKit.fromJson(jsonMapperKit.toJson(result) , clazz);
+        return JsonKit.parse(JsonKit.mapToString(this.result) , clazz);
     }
 
     public String getRetmsg() {

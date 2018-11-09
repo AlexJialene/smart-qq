@@ -5,7 +5,7 @@ import com.keizyi.smartqq.bean.response.HttpMapResult;
 import com.keizyi.smartqq.bean.response.LoginResponse;
 import com.keizyi.smartqq.bean.XLoginFormData;
 import com.keizyi.smartqq.bean.XLogin;
-import com.keizyi.smartqq.kit.JsonMapperKit;
+import com.keizyi.smartqq.kit.JsonKit;
 import com.keizyi.smartqq.kit.RequestPathKit;
 import com.keizyi.smartqq.kit.SmartQQKit;
 import org.slf4j.Logger;
@@ -24,8 +24,6 @@ public class SmartQQClient {
 
     private final Callback callback;
     private Logger logger = LoggerFactory.getLogger(SmartQQClient.class);
-
-    private JsonMapperKit jsonMapper = JsonMapperKit.nonNullMapper();
 
     //ptqrshow response Set-Cookie & ptqrlogin? cookie
     private String qrsig;
@@ -85,7 +83,7 @@ public class SmartQQClient {
                 .get();
 
         logger.debug("get self info : {}", resultStr);
-        HttpMapResult result = jsonMapper.fromJson(resultStr, HttpMapResult.class);
+        HttpMapResult result = JsonKit.parse(resultStr, HttpMapResult.class);
         if (0 == result.getRetcode()) {
             SelfInfo selfInfo = (SelfInfo) result.asClass(SelfInfo.class);
             if (null != selfInfo) {
@@ -192,14 +190,14 @@ public class SmartQQClient {
 
         logger.debug("getVfWebQQ result : {}", result);
 
-        LoginResponse loginResponse = jsonMapper.fromJson(result, LoginResponse.class);
+        LoginResponse loginResponse = JsonKit.parse(result, LoginResponse.class);
         if (null != loginResponse && 0 == loginResponse.getRetcode()) {
             this.vfwebqq = loginResponse.getResult().getVfwebqq();
         }
     }
 
     protected String jsonFormData(Object obj) {
-        return "r=" + this.jsonMapper.toJson(obj);
+        return "r=" + JsonKit.toFeatureJson(obj);
     }
 
     protected XLogin xLogin() {

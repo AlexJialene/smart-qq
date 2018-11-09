@@ -1,7 +1,7 @@
 package com.keizyi.smartqq.core;
 
 import com.keizyi.smartqq.kit.HttpRequestKit;
-import com.keizyi.smartqq.kit.JsonMapperKit;
+import com.keizyi.smartqq.kit.JsonKit;
 import com.keizyi.smartqq.kit.RequestPathKit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +79,7 @@ public class RequestHelper {
 
         logger.debug("the request [ {} ] result: {}", reqName, this.result);
 
-        return JsonMapperKit.nonNullMapper().fromJson(this.result, clazz);
+        return JsonKit.parse(this.result, clazz);
     }
 
     public String get() {

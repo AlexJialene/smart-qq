@@ -30,12 +30,16 @@ public class KeepPullMessage extends Thread{
             return ;
         }
         this.startFlag = true;
-        logger.info("开启接收QQ消息");
+
         super.start();
     }
 
     @Override
     public void run() {
+        logger.debug("keep pull message cookie: {}",this.client.getCheckSigResponseCookie());
+        logger.debug("keep pull message psessionid: {}",this.client.xLogin().getPsessionid());
+        logger.info("开启接收QQ消息");
+
         RequestHelper requestHelper = SmartQQClient.Request.$(RequestPathKit.PULL_MSG)
                 .addHeader("cookie",this.client.getCheckSigResponseCookie())
                 .addHeader("origin","https://d1.web2.qq.com")
@@ -44,7 +48,8 @@ public class KeepPullMessage extends Thread{
 
         while (startFlag){
             String result = requestHelper.sendPost(this.client.jsonFormData(data)).get();
-            logger.debug("pull message result: {}" ,result);
+
+            logger.info("pull message result: {}" ,result);
             //callback
 
 
