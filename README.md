@@ -32,7 +32,7 @@ new SmartQQClient(new Callback() {
 
 ```
 > If you start to prompt to receive a message error: `pull message json string error!`.
-* 1.Log on to [web/smart QQ](https://web2.qq.com){target:"_blank"} and ensure that the message is successful.
+* 1.Log on to [web/smart QQ](https://web2.qq.com) and ensure that the message is successful.
 * 2.Start the project (before closing smart/web QQ).
 
 
