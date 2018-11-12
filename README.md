@@ -31,7 +31,8 @@ new SmartQQClient(new Callback() {
 }).startReceive();
 
 ```
-> If you start to prompt to receive a message error: `pull message json string error!`.
+> If you start to prompt to receive a message error: `pull message json string error!`.The reason for this error is still looking for
+
 * 1.Log on to [web/smart QQ](https://web2.qq.com) and ensure that the message is successful.
 * 2.Start the project (before closing smart/web QQ).
 
