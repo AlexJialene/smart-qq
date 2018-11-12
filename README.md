@@ -35,6 +35,7 @@ new SmartQQClient(new Callback() {
 The reason for this error is that the /poll2 interface returns an error：
 > {"errmsg":"error","retcode":0,"retmsg":"ok"}
 
+### how to solve this problem
 * 1.Log on to [web/smart QQ](https://web2.qq.com) and ensure that the message is successful.
 * 2.Start the project (before closing smart/web QQ).
 
