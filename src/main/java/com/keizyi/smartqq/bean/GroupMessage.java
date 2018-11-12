@@ -34,9 +34,14 @@ public class GroupMessage {
 
     private long to_uin;
 
+    /**
+     * last one = message
+     *
+     * @return message
+     */
     public String getMessage() {
-        if (null != content[3])
-            return content[3].toString();
+        if (null != content[content.length - 1])
+            return content[content.length - 1].toString();
         return null;
     }
 

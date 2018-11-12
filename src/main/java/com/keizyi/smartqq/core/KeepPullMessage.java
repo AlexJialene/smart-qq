@@ -1,8 +1,6 @@
 package com.keizyi.smartqq.core;
 
-import com.keizyi.smartqq.bean.Message;
-import com.keizyi.smartqq.bean.MessageValue;
-import com.keizyi.smartqq.bean.Pull2FormData;
+import com.keizyi.smartqq.bean.*;
 import com.keizyi.smartqq.bean.response.HttpListResult;
 import com.keizyi.smartqq.kit.RequestPathKit;
 import org.slf4j.Logger;
@@ -61,9 +59,10 @@ public class KeepPullMessage extends Thread{
                         this.client.callback().onMessage((Message) messageValue.asClass(Message.class));
                         break;
                     case "group_message":
+                        this.client.callback().groupMessage((GroupMessage) messageValue.asClass(GroupMessage.class));
                         break;
-
                     case "discu_message":
+                        this.client.callback().discuMessage((DiscuMessage) messageValue.asClass(DiscuMessage.class));
                         break;
 
                     default:
