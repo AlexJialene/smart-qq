@@ -31,6 +31,10 @@ public enum RequestPathKit {
     PULL_MSG(
             "https://d1.web2.qq.com/channel/poll2",
             "https://d1.web2.qq.com/proxy.html?v=20151105001&callback=1&id=2"
+    ),
+    GET_RECENT(
+            "https://d1.web2.qq.com/channel/get_recent_list2",
+            "https://d1.web2.qq.com/proxy.html?v=20151105001&callback=1&id=2"
     );
 
 

@@ -32,8 +32,12 @@ public class Application {
             public void discuMessage(DiscuMessage message) {
                 System.out.println("讨论组消息");
             }
-        }).startReceive();
+        });
 
 
+        Thread.sleep(2000);
+
+
+        smartQQClient.startReceive();
     }
 }

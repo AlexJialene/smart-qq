@@ -1,10 +1,9 @@
 package com.keizyi.smartqq.core;
 
-import com.keizyi.smartqq.bean.SelfInfo;
+import com.keizyi.smartqq.bean.*;
+import com.keizyi.smartqq.bean.response.HttpListResult;
 import com.keizyi.smartqq.bean.response.HttpMapResult;
 import com.keizyi.smartqq.bean.response.LoginResponse;
-import com.keizyi.smartqq.bean.XLoginFormData;
-import com.keizyi.smartqq.bean.XLogin;
 import com.keizyi.smartqq.kit.JsonKit;
 import com.keizyi.smartqq.kit.RequestPathKit;
 import com.keizyi.smartqq.kit.SmartQQKit;
@@ -13,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URLConnection;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -59,6 +59,18 @@ public class SmartQQClient {
     public SmartQQClient closeReceive() {
         this.keepPullMessage.close();
         return this;
+    }
+
+    public List<Recent> getRecent(){
+
+        HttpListResult result = (HttpListResult) Request.$(RequestPathKit.GET_RECENT)
+                .addHeader("content-type","application/x-www-form-urlencoded")
+                .addHeader("origin","https://d1.web2.qq.com")
+                .sendPost(this.jsonFormData(new RecentFormData(this.vfwebqq , this.xLogin.getPsessionid())))
+                .toResult(HttpListResult.class);
+
+
+        return null;
     }
 
     private boolean login() {
