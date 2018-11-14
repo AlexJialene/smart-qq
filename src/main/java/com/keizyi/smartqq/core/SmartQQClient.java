@@ -69,6 +69,9 @@ public class SmartQQClient {
                 .sendPost(this.jsonFormData(new RecentFormData(this.vfwebqq , this.xLogin.getPsessionid())))
                 .toResult(HttpListResult.class);
 
+        if (0 == result.getRetcode()){
+            return result.getResult();
+        }
 
         return null;
     }
