@@ -35,6 +35,10 @@ public enum RequestPathKit {
     GET_RECENT(
             "https://d1.web2.qq.com/channel/get_recent_list2",
             "https://d1.web2.qq.com/proxy.html?v=20151105001&callback=1&id=2"
+    ),
+    GET_FRIENDS(
+            "https://s.web2.qq.com/api/get_user_friends2",
+            "https://s.web2.qq.com/proxy.html?v=20130916001&callback=1&id=1"
     );
 
 

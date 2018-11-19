@@ -74,4 +74,12 @@ public class SmartQQKit {
         LOGGER.debug("vfCookie : {}", sb.toString());
         return sb.toString();
     }
+
+    /**
+     * get user friend param (hash)
+     * @return hash
+     */
+    public static String hash2(String uin , String vfwebqq){
+        //todo
+    }
 }

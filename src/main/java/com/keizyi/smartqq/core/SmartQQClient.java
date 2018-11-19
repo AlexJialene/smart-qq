@@ -76,6 +76,15 @@ public class SmartQQClient {
         return null;
     }
 
+    public List getFriends(){
+        //todo
+        HttpMapResult result = (HttpMapResult) Request.$(RequestPathKit.GET_FRIENDS)
+                .addHeader("content-type","application/x-www-form-urlencoded")
+                .addHeader("origin","https://s.web2.qq.com")
+                .sendPost(this.jsonFormData(new FriendFormData(this.vfwebqq , hash)))
+                .toResult(HttpListResult.class);
+    }
+
     private boolean login() {
         insQRCodePath();
         insQRCode();
