@@ -2,9 +2,10 @@
 
 > In development
 
-## preface
+## preface && project status
 
-Because the official website protocol changes frequently, So write a project and keep updating.
+~~Because the official website protocol changes frequently, So write a project and keep updating.~~ 
+Stop maintenance
 
 environment：
 * java 8
@@ -31,14 +32,16 @@ new SmartQQClient(new Callback() {
 }).startReceive();
 
 ```
-> If you start to prompt to receive a message error: `pull message json string error!`.
+-------
+
+### Problem
+If you start to prompt to receive a message error: `pull message json string error!`.
 The reason for this error is that the /poll2 interface returns an error：
-> {"errmsg":"error","retcode":0,"retmsg":"ok"}
+{"errmsg":"error","retcode":0,"retmsg":"ok"}
 
 ### how to solve this problem
 * 1.Log on to [web/smart QQ](https://web2.qq.com) and ensure that the message is successful.
 * 2.Start the project (before closing smart/web QQ).
-* 3.
 
 
 
