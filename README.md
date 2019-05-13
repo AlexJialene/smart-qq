@@ -1,10 +1,12 @@
 # smart-qq
 
-> In development
+> Stop maintenance
 
 ## preface && project status
 
 ~~Because the official website protocol changes frequently, So write a project and keep updating.~~ 
+<br>
+
 Stop maintenance
 
 environment：
